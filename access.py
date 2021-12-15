@@ -1,15 +1,13 @@
 from winsys import fs
-import winsys
 import os
-from pprint import pprint
 
 
-def directory_access(dir_path):
-    directory = winsys.fs.dir(dir_path)
+def directory_access(directory_path):
+    directory = fs.dir(directory_path)
     all_access = []
     for ace in directory.security().dacl:
         user = str(ace.trustee)[str(ace.trustee).find('\\') + 1:]
-        access_flags = winsys.fs.FILE_ACCESS.names_from_value(ace.access)
+        access_flags = fs.FILE_ACCESS.names_from_value(ace.access)
         if user not in ['Администратор', 'Прошедшие проверку', 'СИСТЕМА', 'Администраторы', 'Пользователи', 'Администраторы домена']:
 
             access = []
@@ -35,26 +33,25 @@ def directory_access(dir_path):
                 access.append('Чтение и выполнение')
             if set(read).issubset(set(access_flags)):
                 access.append('Чтение')
+            access.append(user)
+            access.append(directory_path[directory_path.rfind('\\') + 1:])
             access.reverse()
-            all_access.append({user: access})
+            for i in range(5):
+                if len(access) < 7:
+                    access.append(None)
+            all_access.append(access)
     return all_access
 
 
 def dir_list(root_path):
-    return [item for item in os.listdir(root_path) if os.path.isdir(os.path.join(root_path, item))]
+    return list(item for item in os.listdir(root_path) if os.path.isdir(os.path.join(root_path, item)))
 
 
 def directories_access(root_path):
-    access = {}
+    access = []
     for directory in dir_list(root_path):
-        path = f'\\\\fs\SHARE\Documents\{directory}'
-        access[directory] = directory_access(path)
+        path = f'{root_path}\\{directory}'
+        for dir in directory_access(path):
+            access.append(dir)
     return access
-
-
-if __name__ == '__main__':
-    root = r'\\fs\SHARE\Documents'
-    pprint(directories_access(root))
-
-
 
