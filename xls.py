@@ -4,6 +4,7 @@ import os
 import openpyxl
 from openpyxl.styles import PatternFill
 from win32com.client import Dispatch
+from tqdm import tqdm
 
 
 class Excel:
@@ -17,15 +18,18 @@ class Excel:
         self.dir_path = path['dir']
         # загружаем или создаем файл
         if os.path.exists(self.file_path):
+            print(f'Открываем файл {self.file_path}')
             self.wb = openpyxl.open(self.file_path)
             self.ws_now = self.wb.create_sheet(self.ws_now_name(), 0)  # insert at first position
         else:
+            print(f'Создаем файл {self.file_path}')
             self.wb = openpyxl.Workbook()
             self.ws_now = self.wb.active
             self.ws_now.title = self.ws_now_name()
 
     def ws_now_name(self):
         """создает название листа на основании текущей даты (если такой лист уже есть, добавляет время)"""
+        print(f'Формируем имя листа...')
         ws_name1 = datetime.datetime.today().strftime('%d-%m-%Y')
         ws_name2 = datetime.datetime.today().strftime('%d-%m-%Y %H-%M-%S')
         return ws_name1 if ws_name1 not in self.wb.sheetnames else ws_name2
@@ -38,6 +42,7 @@ class Excel:
 
     def write(self, data, sheet_number):
         """записываем данные на лист"""
+        print(f'Заносим данные на лист {self.ws_now.title}...')
         if data:
             ws = self.wb[self.wb.sheetnames[sheet_number]]
             for num_string, string in enumerate(data, 1):
@@ -92,6 +97,7 @@ class Excel:
 
             if data_ws_0 != data_ws_1:
                 self.coloring_tab()
+                print('Отмечаем удаленные и назначенные права...')
 
             [self.coloring_string(num_string, len(str_data_ws_0), 'green') for num_string, str_data_ws_0 in enumerate(data_ws_0, 1)]
 
@@ -174,6 +180,8 @@ if __name__ == '__main__':
         # сравниваем два листа, изменения окрашиваем, если изменения есть, окрашиваем лист.
         xxl.coloring_on_difference(data_ws_now, data_ws_previous)
     # сохраняем файл
+    print(f'Сохраняем документ...')
     xxl.wb_save()
     # выставляем оптимальное значение ширины стролбцов
     auto_size_column(xxl.file_path, xxl.ws_now.title)
+    print('Готово...')

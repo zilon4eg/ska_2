@@ -1,5 +1,6 @@
 from winsys import fs
 import os
+from tqdm import tqdm
 
 
 def directory_access(directory_path):
@@ -49,7 +50,7 @@ def dir_list(root_path):
 
 def directories_access(root_path):
     access = []
-    for directory in dir_list(root_path):
+    for directory in tqdm(dir_list(root_path), 'Анализируем права доступа: '):
         path = f'{root_path}\\{directory}'
         for dir in directory_access(path):
             access.append(dir)
