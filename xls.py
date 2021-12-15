@@ -31,7 +31,9 @@ class Excel:
         return ws_name1 if ws_name1 not in self.wb.sheetnames else ws_name2
 
     def wb_save(self):
-        """сохраняем файл"""
+        """снимаем выделение со всех листов книги и сохраняем файл"""
+        for sheet in self.wb:
+            sheet.sheet_view.tabSelected = False
         self.wb.save(self.file_path)
 
     def write(self, data, sheet_number):
