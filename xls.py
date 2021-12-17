@@ -95,12 +95,16 @@ class Excel:
         # проверка на наличие данных в обоих листах
         if data_ws_0 and data_ws_1:
 
+            # если массивы данных отличаются, маркируем ярлык листа
             if data_ws_0 != data_ws_1:
                 self.coloring_tab()
                 print('Отмечаем удаленные и назначенные права...')
 
+            # окрашиваем ВСЕ ячейки с данными в зеленый
             [self.coloring_string(num_string, len(str_data_ws_0), 'green') for num_string, str_data_ws_0 in enumerate(data_ws_0, 1)]
 
+            # если заголовки сличаемых строк совпадают, отменяем окраску совпадающих ячеек
+            # если длина "старой" строки больше "новой", копируем строку в низ листа и окрашиваем в красный несовпадающие ячейки
             num_redline = len(data_ws_0) + 4
             for num_string, str_data_ws_0 in enumerate(data_ws_0, 1):
                 for str_data_ws_1 in data_ws_1:
@@ -112,6 +116,7 @@ class Excel:
                             self.coloring_string(num_redline, len(str_data_ws_0), None)
                             num_redline += 1
 
+            # если заголовок строка "старого" листа отсутствует на "новом", копируем строку в низ листа и окрашиваем в красный
             header_data_ws_0 = [[str_data_ws_0[0], str_data_ws_0[1]] for str_data_ws_0 in data_ws_0]
             for str_data_ws_1 in data_ws_1:
                 if [str_data_ws_1[0], str_data_ws_1[1]] not in header_data_ws_0:
